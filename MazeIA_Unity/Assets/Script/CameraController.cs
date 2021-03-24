@@ -11,6 +11,9 @@ public class CameraController : MonoBehaviour
         if (Mathf.Abs(transform.position.x - Camera.main.ScreenToWorldPoint(Input.mousePosition).x) > 6.4f 
             || Mathf.Abs(transform.position.y - Camera.main.ScreenToWorldPoint(Input.mousePosition).y) > 4f)
         {
+            var aim = Vector3.right * Camera.main.ScreenToWorldPoint(Input.mousePosition).x +
+                        Vector3.up * Camera.main.ScreenToWorldPoint(Input.mousePosition).y +
+                            Vector3.forward * -10f;
             transform.position = Vector3.Slerp(transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition) + Vector3.forward * -10f, speed);
         }
     }

@@ -7,6 +7,7 @@ public class TileTrap : MazeTile
     // Start is called before the first frame update
     void Start()
     {
+        type = TileTypes.Trap;
         sprite = Resources.Load<Sprite>("Sprites/tile01");
         color = new Color(0.6f, 0, 0);
     }

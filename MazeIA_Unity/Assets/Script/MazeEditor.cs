@@ -6,30 +6,44 @@ public class MazeEditor : MonoBehaviour
 {
 
     [Header("Component")]
-    [SerializeField] MazeGrid grid;
+    [SerializeField] MazeMap map;
+    [SerializeField] TypeToTileConverter converter;
+    [SerializeField] List<MazeTile> tileList = new List<MazeTile>();
     [Header("Brush Infos")]
     [SerializeField] private MazeTile currentTile;
 
-    private void Start()
+   private void Awake()
     {
-        grid = new MazeGrid(24, 15, 0.5f);
+
+        converter = TypeToTileConverter.GetInstance();
+        converter.SetArray(tileList.ToArray());
+        map = new MazeMap(24, 15, 0.5f, tileList[0]);
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
-            grid.SetValue(Camera.main.ScreenToWorldPoint(Input.mousePosition), currentTile);
+            map.SetTileValue(Camera.main.ScreenToWorldPoint(Input.mousePosition), currentTile);
         }
 
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButton(1))
         {
-            grid.SetValue(Camera.main.ScreenToWorldPoint(Input.mousePosition), new TileEmpty());
+            map.SetTileValue(Camera.main.ScreenToWorldPoint(Input.mousePosition), new TileEmpty());
+        }
+
+        if (Input.GetKeyDown(KeyCode.S)){
+            map.Save();
+        }
+
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            map.Load();
         }
     }
-    public void SetCurrentTile(MazeTile tile)
+    public void SetCurrentTile(int tileNb)
     {
-        currentTile = tile;
+        currentTile = tileList[tileNb];
     }
 
     public MazeTile GetCurrentTile()

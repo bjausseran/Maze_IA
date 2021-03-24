@@ -4,11 +4,23 @@ using UnityEngine;
 
 public class MazeTile : MonoBehaviour
 {
+    public enum TileTypes
+    {
+        Empty,
+        Path,
+        Wall,
+        Mud,
+        Trap,
+    }
+
     [Header("Design")]
     protected Sprite sprite;
     protected Color color;
 
     [Header("Infos")]
+    protected TileTypes type = TileTypes.Empty;
+    protected int x;
+    protected int y;
     protected bool walkable = true;
     protected float speedModifier = 1;
     protected bool gameEnder = true;
@@ -20,6 +32,22 @@ public class MazeTile : MonoBehaviour
     public void SetColor(Color color)
     {
         this.color = color;
+    }
+    public int GetXPos()
+    {
+        return x;
+    }
+    public void SetXPos(int x)
+    {
+        this.x = x;
+    }
+    public int GetYPos()
+    {
+        return y;
+    }
+    public void SetYPos(int y)
+    {
+        this.y = y;
     }
     public Sprite GetSprite()
     {
@@ -55,4 +83,24 @@ public class MazeTile : MonoBehaviour
     {
         this.gameEnder = value;
     }
+
+
+    [System.Serializable]
+    public class SaveObject
+    {
+        public TileTypes type;
+        public int x;
+        public int y;
+    }
+
+    public SaveObject Save()
+    {
+        return new SaveObject
+        {
+            type = type,
+            x = x,
+            y = y
+        };
+    }
+
 }

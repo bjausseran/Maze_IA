@@ -16,10 +16,11 @@ public class MazeGrid
     private int tileNb;
     private float cellSize;
     private Vector3 originPosition;
+    private MazeTile defaultTile;
     private MazeTile[,] gridArray;
     private SpriteRenderer[,] spriteArray;
 
-    public MazeGrid(int width, int height, float cellSize)
+    public MazeGrid(int width, int height, float cellSize, MazeTile defaultTile)
     {
         //Load a Sprite (Assets/Resources/Sprites/sprite01.png)
         tile = Resources.Load<Sprite>("Sprites/tile01");
@@ -28,6 +29,7 @@ public class MazeGrid
         this.width = width;
         this.height = height;
         this.cellSize = cellSize;
+        this.defaultTile = defaultTile;
         this.originPosition = new Vector3(- width * cellSize * 0.5f, - height * cellSize * 0.5f);
 
         gridArray = new MazeTile[width, height];
@@ -38,7 +40,9 @@ public class MazeGrid
             for (int y = 0; y < gridArray.GetLength(1); y++)
             {
                 //CreateTile(map.transform, "base", GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, Color.white, 1f);
+                
                 spriteArray[x, y] = CreateTile(map.transform, "maze", GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, Camera.main.backgroundColor, 0.98f);
+                SetValue(x, y, defaultTile);
                 Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.white, 100f);
                 Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.white, 100f);
             }
@@ -56,7 +60,10 @@ public class MazeGrid
     {
         if (x >= 0 && y >= 0 && x < width && y < height)
         {
-            gridArray[x, y] = tile;
+            if(gridArray[x, y]) GameObject.Destroy(gridArray[x, y].gameObject.GetComponent<MazeTile>());
+            gridArray[x, y] = (MazeTile) spriteArray[x, y].gameObject.AddComponent(tile.GetType());
+            gridArray[x, y].SetXPos(x);
+            gridArray[x, y].SetYPos(y);
             spriteArray[x, y].color = tile.GetColor();
             Debug.Log("MazeGrid, SetValue(x:y) : Color = " + tile.GetColor());
         }
@@ -78,7 +85,7 @@ public class MazeGrid
         }
         else
         {
-            return new TileWall();
+            return defaultTile;
         }
     }
 
@@ -111,4 +118,5 @@ public class MazeGrid
     {
         return map;
     }
+
 }
