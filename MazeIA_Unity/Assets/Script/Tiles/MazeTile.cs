@@ -11,11 +11,13 @@ public class MazeTile : MonoBehaviour
         Wall,
         Mud,
         Trap,
+        Start,
+        End,
     }
 
     [Header("Design")]
     protected Sprite sprite;
-    protected Color color;
+    protected Color color = new Color();
 
     [Header("Infos")]
     protected TileTypes type = TileTypes.Empty;
@@ -23,8 +25,33 @@ public class MazeTile : MonoBehaviour
     protected int y;
     protected bool walkable = true;
     protected float speedModifier = 1;
-    protected bool gameEnder = true;
+    protected bool gameEnder = false;
 
+
+    [Header("Pathfinding")]
+    public int gCost;
+    public int hCost;
+    public int fCost;
+
+    public MazeTile previousStep;
+
+    public override string ToString()
+    {
+        return x + ", " + y;
+    }
+    public void CalculateFCost()
+    {
+        fCost = gCost + hCost;
+    }
+
+    public TileTypes GetTileType()
+    {
+        return type;
+    }
+    public void SetTileType(TileTypes type)
+    {
+        this.type = type;
+    }
     public Color GetColor()
     {
         return color;

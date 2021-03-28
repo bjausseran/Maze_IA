@@ -5,10 +5,10 @@ using UnityEngine;
 public class TileEmpty : MazeTile
 {
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         sprite = Resources.Load<Sprite>("Sprites/tile01");
-        color = new Color(0, 0, 0, 0);
+        color = Camera.main.backgroundColor;
 
     }
 }

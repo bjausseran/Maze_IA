@@ -1,0 +1,21 @@
+Using pre-set license
+Built from '2020.2/staging' branch; Version is '2020.2.6f1 (8a2143876886) revision 9052483'; Using compiler version '192528614'; Build Type 'Release'
+OS: 'Windows 10 Pro; OS build 18363.1198; Version 1909; 64bit' Language: 'fr' Physical Memory: 3968 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 0
+
+ COMMAND LINE ARGUMENTS:
+C:\Program Files\Unity\Hub\Editor\2020.2.6f1\Editor\Unity.exe
+-adb2
+-batchMode
+-noUpm
+-name
+AssetImportWorker30
+-projectPath
+C:/Users/Utilisateur/Documents/perso/_GIT/Maze_IA/MazeIA_Unity
+-logFile
+Logs/AssetImportWorker30.log
+-srvPort
+53975
+Successfully changed project path to: C:/Users/Utilisateur/Documents/perso/_GIT/Maze_IA/MazeIA_Unity
+C:/Users/Utilisateur/Documents/perso/_GIT/Maze_IA/MazeIA_Unity
+Using Asset Import Pipeline V2.
