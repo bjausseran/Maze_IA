@@ -25,7 +25,7 @@ public class MazeTile : MonoBehaviour
     protected int x;
     protected int y;
     protected bool walkable = true;
-    protected float speedModifier = 1;
+    protected int speedModifier = 1;
     protected bool gameEnder = false;
 
 
@@ -105,11 +105,11 @@ public class MazeTile : MonoBehaviour
         this.walkable = walkable;
     }
 
-    public float GetSpeedModifier()
+    public int GetSpeedModifier()
     {
         return speedModifier;
     }
-    public void SetSpeedModifier(float speedMd)
+    public void SetSpeedModifier(int speedMd)
     {
         this.speedModifier = speedMd;
     }

@@ -77,8 +77,10 @@ public class Pathfinding
                         closedList.Add(adjacentStep);
                         continue;
                     }
+                    
 
-                    int tentativeGCost = currentStep.GetGCost()+ CalculateDistanceCost(currentStep, adjacentStep);
+                    //GetSpeedModifier is for the mud
+                    int tentativeGCost = currentStep.GetGCost()+ CalculateDistanceCost(currentStep, adjacentStep)*adjacentStep.GetSpeedModifier();
                     Debug.Log("Pathfinding, FindPath : tentativeGCost < adjacentStep.gCost = " + tentativeGCost + "< " + adjacentStep.GetGCost());
                     if (tentativeGCost < adjacentStep.GetGCost())
                     {

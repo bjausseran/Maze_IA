@@ -10,6 +10,7 @@ public class TileMud : MazeTile
         type = TileTypes.Mud;
         sprite = Resources.Load<Sprite>("Sprites/tile01");
         color = new Color(0.3f, 0.2f, 0.1f);
+        speedModifier = 2;
     }
 
 }
