@@ -11,12 +11,12 @@ public class MazeMap
     private int height;
     private TypeToTileConverter converter;
 
-    public MazeMap(int width, int height, float cellSize, MazeTile tile)
+    public MazeMap(int width, int height, float cellSize, MazeTile tile, MazeMode mode)
     {
         this.converter = TypeToTileConverter.GetInstance();
         this.width = width;
         this.height = height;
-        grid = new MazeGrid(width, height, 0.5f, tile);
+        grid = new MazeGrid(width, height, 0.5f, tile, mode);
     }
     public MazeGrid GetGrid()
     {

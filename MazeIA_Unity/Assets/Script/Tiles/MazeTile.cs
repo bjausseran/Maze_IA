@@ -13,6 +13,7 @@ public class MazeTile : MonoBehaviour
         Trap,
         Start,
         End,
+        Solution,
     }
 
     [Header("Design")]
@@ -43,6 +44,16 @@ public class MazeTile : MonoBehaviour
     {
         fCost = gCost + hCost;
     }
+    public int GetGCost()
+    {
+        return gCost;
+    }
+    public void SetGCost(int gCost)
+    {
+        Debug.Log("MazeTile, SetGCost : gCost = " + gCost);
+        this.gCost = gCost;
+    }
+
 
     public TileTypes GetTileType()
     {
@@ -110,7 +121,6 @@ public class MazeTile : MonoBehaviour
     {
         this.gameEnder = value;
     }
-
 
     [System.Serializable]
     public class SaveObject

@@ -16,7 +16,7 @@ public class MazeResolver : MonoBehaviour
 
         converter = TypeToTileConverter.GetInstance();
         converter.SetArray(tileList.ToArray());
-        map = new MazeMap(24, 15, 0.5f, tileList[0]);
+        map = new MazeMap(24, 15, 0.5f, tileList[0], MazeMode.Resolver);
         map.Load();
         pathfinding = new Pathfinding(map.GetGrid());
     }
@@ -25,19 +25,20 @@ public class MazeResolver : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Debug.Log("MazeResolver, Update : mouse world pos = " + mouseWorldPosition);
-            map.GetGrid().GetXY(mouseWorldPosition, out int x, out int y);
-            Debug.Log("MazeResolver, Update : mouse in & out = " + x + ", " + y);
-            List<MazeTile> path = pathfinding.FindPath(map.GetGrid().FindStart()[0], map.GetGrid().FindStart()[1], map.GetGrid().FindEnd()[0], map.GetGrid().FindEnd()[1]);
+            //Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            //Debug.Log("MazeResolver, Update : mouse world pos = " + mouseWorldPosition);
+            //map.GetGrid().GetXY(mouseWorldPosition, out int x, out int y);
+            //Debug.Log("MazeResolver, Update : mouse in & out = " + x + ", " + y);
+            var start = map.GetGrid().FindStart();
+            var end = map.GetGrid().FindEnd();
+
+            List<MazeTile> path = pathfinding.FindPath(start[0], start[1], end[0], end[1]);
             if (path != null)
             {
-                for (int i = 0; i < path.Count - 1;  i++)
+                for (int i = 1; i < path.Count - 1;  i++)
                 {
                     Debug.Log("MazeResolver, Update : path i = " + path[i].GetXPos() + ", " + path[i].GetYPos());
-                    Debug.DrawLine(new Vector3(path[i].GetXPos(), path[i].GetYPos()) * 10f + Vector3.one * 5f, new Vector3(path[i + 1].GetXPos(), path[i + 1].GetYPos()) * 10f + Vector3.one * 5f);
-                    path[i].SetColor(Color.green);
-                    map.GetGrid().SetValue(path[i].GetXPos(), path[i].GetYPos(), tileList[4]);
+                    map.GetGrid().SetValue(path[i].GetXPos(), path[i].GetYPos(), tileList[7]);
                 }
             }
         }

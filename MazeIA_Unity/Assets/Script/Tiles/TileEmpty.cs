@@ -9,6 +9,7 @@ public class TileEmpty : MazeTile
     {
         sprite = Resources.Load<Sprite>("Sprites/tile01");
         color = Camera.main.backgroundColor;
+        SetWalkable(false);
 
     }
 }

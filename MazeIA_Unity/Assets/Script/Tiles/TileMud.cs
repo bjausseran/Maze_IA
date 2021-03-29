@@ -5,7 +5,7 @@ using UnityEngine;
 public class TileMud : MazeTile
 {
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         type = TileTypes.Mud;
         sprite = Resources.Load<Sprite>("Sprites/tile01");
