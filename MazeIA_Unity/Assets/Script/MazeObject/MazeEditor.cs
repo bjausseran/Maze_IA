@@ -35,13 +35,14 @@ public class MazeEditor : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.S)){
-            map.Save();
+            //map.Save();
+            ui.DisplayFileWindow(EditorUI.FileMode.Save);
         }
 
         if (Input.GetKeyDown(KeyCode.L))
         {
             //map.Load();
-            ui.DisplayLoadWindow();
+            ui.DisplayFileWindow(EditorUI.FileMode.Load);
         }
     }
     public void SetCurrentTile(int tileNb)

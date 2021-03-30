@@ -61,7 +61,7 @@ public class MazeMap
         return grid.GetValue(worldPos);
     }
 
-    public void Save()
+    public void Save(string name)
     {
         List<MazeTile.SaveObject> saveObjectList = new List<MazeTile.SaveObject>();
         for (int x = 0; x < width; x++)
@@ -76,12 +76,13 @@ public class MazeMap
         Debug.Log("MazeMap, Save : Saved json = " +  output);
 
 
-        SaveSystem.SaveString("/map", output, false);
+        SaveSystem.SaveString("/" + name, output, false);
     }
 
     public void Load(string fileName)
     {
-        MazeTile.SaveObject[] saveObjectArray = JsonHelper.FromJson<MazeTile.SaveObject>(SaveSystem.Load(fileName));
+        Debug.Log("MazeMap, Load : fileName = " + fileName);
+        MazeTile.SaveObject[] saveObjectArray = JsonHelper.FromJson<MazeTile.SaveObject>(SaveSystem.LoadMap(fileName));
         Debug.Log("MazeMap, Load : saveobject lenght + " + saveObjectArray.Length);
         foreach (MazeTile.SaveObject mazeTileSaved in saveObjectArray)
         {

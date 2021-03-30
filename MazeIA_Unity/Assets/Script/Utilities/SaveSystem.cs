@@ -64,10 +64,10 @@ public class SaveSystem : MonoBehaviour
     public static string LoadMap(string fileName)
     {
         Init();
-        Debug.Log("SaveSystem, loadMap : filename = " + SAVE_FOLDER + fileName);
-        if (File.Exists(SAVE_FOLDER + "/Maps/" + fileName))
+        if (File.Exists(SAVE_FOLDER + fileName + ".json"))
         {
-            string saveString = File.ReadAllText(SAVE_FOLDER + "/Maps/" + fileName);
+            Debug.Log("SaveSystem, loadMap : filename = " + SAVE_FOLDER + fileName + ".json");
+            string saveString = File.ReadAllText(SAVE_FOLDER + fileName + ".json");
             return saveString;
         }
         else
