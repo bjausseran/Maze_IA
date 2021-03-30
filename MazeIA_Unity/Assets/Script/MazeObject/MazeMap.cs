@@ -79,7 +79,17 @@ public class MazeMap
         SaveSystem.SaveString("/map", output, false);
     }
 
-    public void Load()
+    public void Load(string fileName)
+    {
+        MazeTile.SaveObject[] saveObjectArray = JsonHelper.FromJson<MazeTile.SaveObject>(SaveSystem.Load(fileName));
+        Debug.Log("MazeMap, Load : saveobject lenght + " + saveObjectArray.Length);
+        foreach (MazeTile.SaveObject mazeTileSaved in saveObjectArray)
+        {
+            grid.SetValue(mazeTileSaved.x, mazeTileSaved.y, converter.EnumToTile(mazeTileSaved.type));
+        }
+    }
+
+    public void LoadMostRecent()
     {
         MazeTile.SaveObject[] saveObjectArray = JsonHelper.FromJson<MazeTile.SaveObject>(SaveSystem.LoadMostRecentFile());
         Debug.Log("MazeMap, Load : saveobject lenght + " + saveObjectArray.Length);

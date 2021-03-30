@@ -7,7 +7,9 @@ public class EditorUI : MonoBehaviour
 {
     [SerializeField] List<Button> buttonList = new List<Button>();
     [SerializeField] MazeEditor editor;
-
+    [SerializeField] MazeMap map;
+    [SerializeField] private GameObject buttonPrefab;
+    [SerializeField] private Transform buttonListContent;
     
 
     // Start is called before the first frame update
@@ -22,9 +24,20 @@ public class EditorUI : MonoBehaviour
         buttonList[4].onClick.AddListener(delegate { ChangeTile(5); });
         buttonList[5].onClick.AddListener(delegate { ChangeTile(6); });
     }
+    public void SetMap(MazeMap map)
+    {
+        this.map = map;
+    }
+
+    public MazeMap GetMap()
+    {
+        return map;
+    }
+
     public void DisplayLoadWindow()
     {
         var fileList = SaveSystem.GetFileList();
+
         GameObject window = new GameObject(name + "window", typeof(RectTransform));
         window.transform.SetParent(transform);
         RectTransform rect = window.GetComponent<RectTransform>();
@@ -32,15 +45,16 @@ public class EditorUI : MonoBehaviour
         rect.anchorMin = new Vector2(0.30f, 0f);
         rect.anchorMax = new Vector2(0.7f, 1f);
         rect.localPosition = Vector3.zero;
+
+        
         for (int i = 0; i < fileList.Count; i++)
         {
-            GameObject fileObject = new GameObject(name + "file", typeof(Text));
-            RectTransform fileRect = fileObject.GetComponent<RectTransform>();
-            fileRect.anchorMin = new Vector2(0.2f, 1f - 0.5f - 0.05f * i);
-            fileRect.anchorMax = new Vector2(0.8f, 1f - 0.05f * i);
-            Text text = fileObject.GetComponent<Text>();
-            text.text = fileList[i];
-            fileObject.transform.SetParent(window.transform);
+            GameObject button = Instantiate(buttonPrefab);
+            var str = fileList[i];
+            button.GetComponent<Button>().onClick.AddListener(delegate { map.Load(str); });
+            button.transform.SetParent(buttonListContent);
+            var buttonText = button.GetComponentInChildren<Text>();
+            buttonText.text = str;
         }
     }
     private void ChangeTile(int tileNb)

@@ -17,7 +17,7 @@ public class MazeResolver : MonoBehaviour
         converter = TypeToTileConverter.GetInstance();
         converter.SetArray(tileList.ToArray());
         map = new MazeMap(24, 15, 0.5f, tileList[0], MazeMode.Resolver);
-        map.Load();
+        map.LoadMostRecent();
         pathfinding = new Pathfinding(map.GetGrid());
     }
 

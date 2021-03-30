@@ -7,6 +7,7 @@ public static class JsonHelper
     public static T[] FromJson<T>(string json)
     {
         Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(json);
+        Debug.Log("JsonHelper, FromJson : wrapper = " + wrapper);
         return wrapper.Items;
     }
 

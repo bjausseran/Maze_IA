@@ -15,10 +15,11 @@ public class MazeEditor : MonoBehaviour
 
    private void Start()
     {
-
+        
         converter = TypeToTileConverter.GetInstance();
         converter.SetArray(tileList.ToArray());
         map = new MazeMap(24, 15, 0.5f, tileList[0], MazeMode.Editor);
+        ui.SetMap(map);
     }
 
     private void Update()
