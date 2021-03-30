@@ -6,4 +6,5 @@ public enum MazeMode
 {
     Editor,
     Resolver,
+    Bet,
 }

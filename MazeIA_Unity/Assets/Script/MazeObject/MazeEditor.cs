@@ -6,6 +6,7 @@ public class MazeEditor : MonoBehaviour
 {
 
     [Header("Component")]
+    [SerializeField] EditorUI ui;
     [SerializeField] MazeMap map;
     [SerializeField] TypeToTileConverter converter;
     [SerializeField] List<MazeTile> tileList = new List<MazeTile>();
@@ -38,7 +39,8 @@ public class MazeEditor : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.L))
         {
-            map.Load();
+            //map.Load();
+            ui.DisplayLoadWindow();
         }
     }
     public void SetCurrentTile(int tileNb)

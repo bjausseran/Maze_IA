@@ -53,7 +53,21 @@ public class SaveSystem : MonoBehaviour
             return null;
         }
     }
-
+    public static List<string> GetFileList()
+    {
+        Init();
+        DirectoryInfo directoryInfo = new DirectoryInfo(SAVE_FOLDER);
+        //Get all saved files
+        FileInfo[] saveFiles = directoryInfo.GetFiles("*." + SAVE_EXTENSION);
+        //Check most recent
+        FileInfo mostRecentFile = null;
+        List<string> FileList = new List<string>();
+        foreach (FileInfo fileinfo in saveFiles)
+        {
+            FileList.Add(fileinfo.Name);
+        }
+        return FileList;
+        }
     public static string LoadMostRecentFile()
     {
         Init();

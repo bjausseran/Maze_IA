@@ -52,7 +52,7 @@ public class MazeGrid
                     spriteArray[x, y] = CreateTile(map.transform, "maze", GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, Camera.main.backgroundColor, 0.95f);
                     SetValue(x, y, defaultTile);
                 }
-                else if (mode == MazeMode.Resolver)
+                else 
                 {
                     spriteArray[x, y] = CreateTile(map.transform, "maze", GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, Camera.main.backgroundColor, 1f);
                     SetValue(x, y, defaultTile);

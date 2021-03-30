@@ -17,6 +17,20 @@ public class MazeMap
         this.width = width;
         this.height = height;
         grid = new MazeGrid(width, height, 0.5f, tile, mode);
+
+        GameObject bankObject = new GameObject("bot_", typeof(BotBank));
+        bankObject.GetComponent<BotBank>().SetGrid(grid);
+        bankObject.GetComponent<BotBank>().SetColor(Color.yellow);
+        Color[] color = { Color.red, Color.blue, Color.green };
+        if (mode == MazeMode.Bet)
+        {
+            for (int i = 0; i < color.Length; i++)
+            {
+                GameObject gameObject = new GameObject("bot_", typeof(BotRunner));
+                gameObject.GetComponent<BotRunner>().SetGrid(grid);
+                gameObject.GetComponent<BotRunner>().SetColor(color[i]);
+            }
+        }
     }
     public MazeGrid GetGrid()
     {

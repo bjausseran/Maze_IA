@@ -22,7 +22,18 @@ public class EditorUI : MonoBehaviour
         buttonList[4].onClick.AddListener(delegate { ChangeTile(5); });
         buttonList[5].onClick.AddListener(delegate { ChangeTile(6); });
     }
-
+    public void DisplayLoadWindow()
+    {
+        var fileList = SaveSystem.GetFileList();
+        GameObject window = new GameObject(name + "window", typeof(RectTransform));
+        window.transform.SetParent(transform); 
+        foreach(string file in fileList)
+        {
+            GameObject fileObject = new GameObject(name + "file", typeof(Text));
+            fileObject.GetComponent<Text>().text = file;
+            fileObject.transform.SetParent(window.transform);
+        }
+    }
     private void ChangeTile(int tileNb)
     {
         Debug.Log("EditorUI, ChangeTile : tile nb = " + tileNb);

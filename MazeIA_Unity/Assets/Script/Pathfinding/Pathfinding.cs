@@ -122,7 +122,7 @@ public class Pathfinding
         return path;
     }
 
-    private List<MazeTile> GetListAdjacent(MazeTile currentStep)
+    public List<MazeTile> GetListAdjacent(MazeTile currentStep)
     {
         List<MazeTile> adjacentList = new List<MazeTile>();
 
