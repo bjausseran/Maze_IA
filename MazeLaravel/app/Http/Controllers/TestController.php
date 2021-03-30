@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Test;
+use App\Maze;
 use Illuminate\Http\Request;
 
 class TestController extends Controller
@@ -14,17 +15,8 @@ class TestController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $tests = Test::paginate();
+        return $tests;
     }
 
     /**
@@ -35,7 +27,22 @@ class TestController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
+        $inputs = $request->except('_token');
+        
+        if(!self::checkIfMazeExist($request->maze_id))
+        {
+            return "404 : This maze does not exists.";
+        }
+
+        $test = new Test();
+        foreach($inputs as $key => $value) 
+        {
+            $test->$key = $value;
+        }
+        $test->save();
+
+        return $test;
     }
 
     /**
@@ -46,18 +53,7 @@ class TestController extends Controller
      */
     public function show(Test $test)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Test  $test
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Test $test)
-    {
-        //
+        return $test;
     }
 
     /**
@@ -69,7 +65,31 @@ class TestController extends Controller
      */
     public function update(Request $request, Test $test)
     {
-        //
+        $inputs = $request->except('_token', '_method');
+        
+        if(!self::checkIfMazeExist($request->maze_id))
+        {
+            return "404 : This maze does not exists.";
+        }
+
+        foreach($inputs as $key => $value)
+        {
+            $test->$key = $value;
+        }
+        $test->save();
+        return $test;
+    }
+    
+    private function checkIfMazeExist(Int $maze_id)
+    {
+        if(Maze::where('id','=', $maze_id)->count() == 0)
+        {
+            return false;
+        }
+        else 
+        {
+            return true;
+        }
     }
 
     /**
@@ -80,6 +100,7 @@ class TestController extends Controller
      */
     public function destroy(Test $test)
     {
-        //
+        $test->delete();
+        return response()->json();
     }
 }

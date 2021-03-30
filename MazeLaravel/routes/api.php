@@ -20,3 +20,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::apiResource('/maze', 'MazeController');
 Route::apiResource('/tile', 'TileController');
+Route::apiResource('/test', 'TestController');
+
+Route::get('/maze/json/{maze}', 'MazeController@getJson')->name('maze.get_json');
+//Route::get('/maze/names', 'MazeController@getNames')->name('maze.get_names');
+
+Route::get('/mazelist', 'MazeController@getNames')->name('maze.mazelist');

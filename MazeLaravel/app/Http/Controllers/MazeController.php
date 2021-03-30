@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Test;
 use App\Maze;
+use App\User;
 use Illuminate\Http\Request;
 
 class MazeController extends Controller
@@ -17,6 +19,11 @@ class MazeController extends Controller
         $mazes = Maze::paginate();
         return $mazes;
     }
+    public function getNames()
+    {
+        $mazes = Maze::pluck('name')->all();
+        return $mazes;
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -26,8 +33,17 @@ class MazeController extends Controller
      */
     public function store(Request $request)
     {
-        
         $inputs = $request->except('_token');
+
+        if(!self::checkIfUserExist($request->user_id))
+        {
+            return "404 : This user does not exists.";
+        }
+        if(self::checkIfNameExist($request->name))
+        {
+            return "403 : This name already exists.";
+        }
+
         $maze = new Maze();
         foreach($inputs as $key => $value) 
         {
@@ -48,9 +64,34 @@ class MazeController extends Controller
     {
         return $maze;
     }
-    public function findJSon(Maze $maze)
+
+    private function checkIfUserExist(Int $user_id)
     {
-        return $maze->$composition;
+        if(User::where('id','=', $user_id)->count() == 0)
+        {
+            return false;
+        }
+        else 
+        {
+            return true;
+        }
+    }
+    private function checkIfNameExist(String $name)
+    {
+        if(maze::where('name','=', $name)->count() == 0)
+        {
+            return false;
+        }
+        else 
+        {
+            return true;
+        }
+    }
+
+
+    public function getJSon(Maze $maze)
+    {
+        return $maze->composition;
     }
 
     /**
@@ -62,7 +103,14 @@ class MazeController extends Controller
      */
     public function update(Request $request, Maze $maze)
     {
+
         $inputs = $request->except('_token', '_method');
+        
+        if(!self::checkIfUserExist($request->user_id))
+        {
+            return "404 : This user does not exists.";
+        }
+
         foreach($inputs as $key => $value)
         {
             $maze->$key = $value;
@@ -79,7 +127,14 @@ class MazeController extends Controller
      */
     public function destroy(Maze $maze)
     {
+        $tests = Test::where('maze_id','=', $maze->id);
+        foreach($tests as $test)
+        {
+            $test->delete();
+        }
+
+        $return = "tests deleted : " + $tests.count();
         $maze->delete();
-        return response()->json();
+        return $return + response()->json();
     }
 }
