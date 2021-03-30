@@ -21,7 +21,7 @@ public class MazeMap
         GameObject bankObject = new GameObject("bot_", typeof(BotBank));
         bankObject.GetComponent<BotBank>().SetGrid(grid);
         bankObject.GetComponent<BotBank>().SetColor(Color.yellow);
-        Color[] color = { Color.red, Color.blue, Color.green };
+        Color[] color = { Color.red, Color.blue, Color.green, Color.black, Color.cyan, Color.gray, Color.magenta };
         if (mode == MazeMode.Bet)
         {
             for (int i = 0; i < color.Length; i++)

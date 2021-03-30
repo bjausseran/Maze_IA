@@ -26,11 +26,20 @@ public class EditorUI : MonoBehaviour
     {
         var fileList = SaveSystem.GetFileList();
         GameObject window = new GameObject(name + "window", typeof(RectTransform));
-        window.transform.SetParent(transform); 
-        foreach(string file in fileList)
+        window.transform.SetParent(transform);
+        RectTransform rect = window.GetComponent<RectTransform>();
+        
+        rect.anchorMin = new Vector2(0.30f, 0f);
+        rect.anchorMax = new Vector2(0.7f, 1f);
+        rect.localPosition = Vector3.zero;
+        for (int i = 0; i < fileList.Count; i++)
         {
             GameObject fileObject = new GameObject(name + "file", typeof(Text));
-            fileObject.GetComponent<Text>().text = file;
+            RectTransform fileRect = fileObject.GetComponent<RectTransform>();
+            fileRect.anchorMin = new Vector2(0.2f, 1f - 0.5f - 0.05f * i);
+            fileRect.anchorMax = new Vector2(0.8f, 1f - 0.05f * i);
+            Text text = fileObject.GetComponent<Text>();
+            text.text = fileList[i];
             fileObject.transform.SetParent(window.transform);
         }
     }
