@@ -43,11 +43,33 @@ public class SaveSystem : MonoBehaviour
     public static string Load(string fileName)
     {
         Init();
-        if (File.Exists(SAVE_FOLDER + fileName + "." + SAVE_EXTENSION))
+        DirectoryInfo directoryInfo = new DirectoryInfo(SAVE_FOLDER);
+        //Get all saved files
+        
+        FileInfo[] saveFiles = directoryInfo.GetFiles("*." + SAVE_EXTENSION);
+        //Check most recent
+        FileInfo file = null;
+        foreach (FileInfo fileinfo in saveFiles)
         {
-            string saveString = File.ReadAllText(SAVE_FOLDER + fileName + "." + SAVE_EXTENSION);
+            if (fileinfo.FullName == fileName)
+            {
+                file = fileinfo;
+            }
+        }
+        Debug.Log("SaveSystem, loadMap : filename = " + file.FullName);
+        string saveString = File.ReadAllText(file.FullName);
+        return saveString;
+    }
+
+    public static string LoadMap(string fileName)
+    {
+        Init();
+        Debug.Log("SaveSystem, loadMap : filename = " + SAVE_FOLDER + fileName);
+        if (File.Exists(SAVE_FOLDER + "/Maps/" + fileName))
+        {
+            string saveString = File.ReadAllText(SAVE_FOLDER + "/Maps/" + fileName);
             return saveString;
-        } 
+        }
         else
         {
             return null;
