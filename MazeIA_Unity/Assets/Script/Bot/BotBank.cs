@@ -50,12 +50,15 @@ public class BotBank : MonoBehaviour
         if (count == 0)
         {
             currentTile = path[it];
-            transform.position = currentTile.transform.position;
             if (currentTile.GetTileType() == MazeTile.TileTypes.Trap) count = -1;
             else if (currentTile.GetTileType() == MazeTile.TileTypes.Mud) count = 100;
             else count = 50;
             if (it!=path.Count-1) it++;
 
+        }
+        else
+        {
+            transform.position = Vector3.Slerp(transform.position, currentTile.transform.position, Mathf.Clamp(1f / (float)count, 0.02f, 0.08f));
         }
     }
 
