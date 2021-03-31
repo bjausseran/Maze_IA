@@ -81,14 +81,12 @@ public class SaveSystem : MonoBehaviour
         DirectoryInfo directoryInfo = new DirectoryInfo(SAVE_FOLDER);
         //Get all saved files
         FileInfo[] saveFiles = directoryInfo.GetFiles("*." + SAVE_EXTENSION);
-        //Check most recent
-        FileInfo mostRecentFile = null;
-        List<string> FileList = new List<string>();
+        List<string> fileList = new List<string>();
         foreach (FileInfo fileinfo in saveFiles)
         {
-            FileList.Add(fileinfo.Name);
+            fileList.Add(fileinfo.Name);
         }
-        return FileList;
+        return fileList;
         }
     public static string LoadMostRecentFile()
     {

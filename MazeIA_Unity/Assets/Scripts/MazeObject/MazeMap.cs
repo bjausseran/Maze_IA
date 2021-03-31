@@ -117,6 +117,12 @@ public class MazeMap
         }
 
     }
+    public class SaveObjectMini
+    {
+        public string[] nameList;
+
+
+    }
 
 
 }

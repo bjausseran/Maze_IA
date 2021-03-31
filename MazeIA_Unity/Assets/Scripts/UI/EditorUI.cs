@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
 
 
@@ -13,6 +14,7 @@ public class EditorUI : MonoBehaviour
         Save,
         Load,
     }
+    [SerializeField] bool fromHttp = true;
 
     [SerializeField] List<Button> buttonList = new List<Button>();
     [SerializeField] List<Button> fileButton = new List<Button>();
@@ -71,7 +73,15 @@ public class EditorUI : MonoBehaviour
             return;
         }
         fileWindowUp = true;
-       var fileList = SaveSystem.GetFileList();
+        var fileList = new List<string>();
+        if (!fromHttp) fileList = SaveSystem.GetFileList();
+        else
+        {
+            var http = gameObject.AddComponent<TestHttpRequest>(); 
+            CoroutineWithData cd = new CoroutineWithData(this, http.GetMazeList());
+            StartCoroutine(WaitForData(cd, mode));
+            Debug.Log("EditorUI, DisplayFileWindow : http response : " + cd.result);  //  'success' or 'fail'
+        }
 
         foreach (Transform child in buttonListContent.transform)
         {
@@ -97,6 +107,55 @@ public class EditorUI : MonoBehaviour
             button.GetComponent<Button>().onClick.AddListener(delegate { SetCurrentFileString(str); });
             button.transform.SetParent(buttonListContent);
             
+        }
+        buttonListContent.parent.parent.gameObject.SetActive(true);
+    }
+
+    private IEnumerator WaitForData(CoroutineWithData corout, FileMode mode)
+    {
+        while (!(corout.result is string) || corout.result == null)
+        {
+            Debug.Log("EditorUI, WaitForData : data is null");
+            yield return false;
+        }
+        Debug.Log("EditorUI, WaitForData : data = " + corout.result); 
+        var responseObj = JsonHelper.FromJson<MazeMap.SaveObjectMini>((string) corout.result);
+        var response = new string[responseObj.Length];
+        for(int i =0; i < response.Length; i++)
+        {
+            response = responseObj[i].nameList;
+        }
+        Debug.Log("EditorUI, WaitForData : data length = " + response.Length);
+        CreateButtons(response, mode);
+        yield return true;
+    }
+
+    private void CreateButtons(string[] names, FileMode mode)
+    {
+
+        foreach (Transform child in buttonListContent.transform)
+        {
+            GameObject.Destroy(child.gameObject);
+        }
+        for (int i = 0; i < names.Length; i++)
+        {
+            GameObject button = Instantiate(buttonPrefab);
+            var str = names[i].Replace(".json", "");
+            var buttonText = button.GetComponentInChildren<Text>();
+            buttonText.text = str;
+
+            if (mode == FileMode.Load)
+            {
+                fileMenus[0].SetActive(true);
+            }
+            else if (mode == FileMode.Save)
+            {
+                fileMenus[1].SetActive(true);
+            }
+
+            button.GetComponent<Button>().onClick.AddListener(delegate { SetCurrentFileString(str); });
+            button.transform.SetParent(buttonListContent);
+
         }
         buttonListContent.parent.parent.gameObject.SetActive(true);
     }
