@@ -48,7 +48,6 @@ public class BotRunner : MonoBehaviour
             if(listLength==0) listTiles = IsWalkable(pathfinding.GetListAdjacent(currentTile), null);
             Debug.Log("BotRunner, Update : listTiles.Count = " + listLength);
                 var pick = Random.Range(0, listLength);
-                transform.position = listTiles[pick].transform.position;
             previousTile = currentTile;
                 currentTile = listTiles[pick];
             if (currentTile.GetTileType() == MazeTile.TileTypes.Trap 
@@ -56,6 +55,10 @@ public class BotRunner : MonoBehaviour
             else if (currentTile.GetTileType() == MazeTile.TileTypes.Mud) count = 40;
             else count = 20;
             
+        }
+        else
+        {
+            transform.position = Vector3.Slerp(transform.position, currentTile.transform.position, Mathf.Clamp( 1f / (float) count, 0.04f, 0.2f));
         }
     }
 
