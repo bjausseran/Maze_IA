@@ -142,6 +142,7 @@ public class SaveSystem : MonoBehaviour
     {
         Init();
         string saveString = LoadMostRecentFile();
+        Debug.Log("SaveSystem, LoadMostRecentObject : json : " + saveString);
         if (saveString != null)
         {
             TSaveObject saveObject = JsonUtility.FromJson<TSaveObject>(saveString);

@@ -1835,6 +1835,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8d88e34e8970104ebe37e57d41ea15b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fromHttp: 1
   buttonList:
   - {fileID: 1642570174}
   - {fileID: 1909438953}
@@ -1842,6 +1843,7 @@ MonoBehaviour:
   - {fileID: 2116925608}
   - {fileID: 496001275}
   - {fileID: 1737318252}
+  mapList: []
   fileButton:
   - {fileID: 660149554}
   - {fileID: 333907076}
@@ -2013,6 +2015,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6854580946230704991, guid: 125916d40a448ed4a9b8bec4d2d023c5, type: 3}
       propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6854580946802841907, guid: 125916d40a448ed4a9b8bec4d2d023c5, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6854580947237033856, guid: 125916d40a448ed4a9b8bec4d2d023c5, type: 3}

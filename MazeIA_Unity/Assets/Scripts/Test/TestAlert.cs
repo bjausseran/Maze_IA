@@ -35,7 +35,7 @@ public class TestAlert : MonoBehaviour
 
             var alertObj = Instantiate(alertPrefab, transform);
             var messageAlert = alertObj.GetComponent<MessageAnimation>();
-            messageAlert.SetUpMessage("Alerte :", "This is an alert", MessageAnimation.Colors.Alerte);
+            messageAlert.SetUpMessage("Alerte :", "This is an error", MessageAnimation.Colors.Error);
         });
     }
 }

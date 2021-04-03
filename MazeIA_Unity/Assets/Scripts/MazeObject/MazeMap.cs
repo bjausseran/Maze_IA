@@ -79,7 +79,24 @@ public class MazeMap
         SaveSystem.SaveString("/" + name, output, false);
     }
 
-    public void Load(string fileName)
+    public string GetDataToUpload()
+    {
+        List<MazeTile.SaveObject> saveObjectList = new List<MazeTile.SaveObject>();
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                saveObjectList.Add(grid.GetValue(x, y).Save());
+            }
+
+        }
+        string output = JsonHelper.ToJson<MazeTile.SaveObject>(saveObjectList.ToArray());
+        Debug.Log("MazeMap, Save : Saved data = " + output);
+
+        return output;
+    }
+
+    public void LoadFromFile(string fileName)
     {
         Debug.Log("MazeMap, Load : fileName = " + fileName);
         MazeTile.SaveObject[] saveObjectArray = JsonHelper.FromJson<MazeTile.SaveObject>(SaveSystem.LoadMap(fileName));
@@ -88,6 +105,18 @@ public class MazeMap
         {
             grid.SetValue(mazeTileSaved.x, mazeTileSaved.y, converter.EnumToTile(mazeTileSaved.type));
         }
+    }
+    public bool LoadFromAPI(string json)
+    {
+        Debug.Log("MazeMap, Load : json = " + json);
+        if (JsonHelper.FromJson<MazeTile.SaveObject>(json) == null) return false;
+        MazeTile.SaveObject[] saveObjectArray = JsonHelper.FromJson<MazeTile.SaveObject>(json);
+        Debug.Log("MazeMap, Load : saveobject lenght + " + saveObjectArray.Length);
+        foreach (MazeTile.SaveObject mazeTileSaved in saveObjectArray)
+        {
+            grid.SetValue(mazeTileSaved.x, mazeTileSaved.y, converter.EnumToTile(mazeTileSaved.type));
+        }
+        return true;
     }
 
     public void LoadMostRecent()
@@ -117,10 +146,11 @@ public class MazeMap
         }
 
     }
-    public class SaveObjectMini
+    [System.Serializable]
+    public class SavedObject
     {
-        public string[] nameList;
-
+        public int id;
+        public string name;
 
     }
 

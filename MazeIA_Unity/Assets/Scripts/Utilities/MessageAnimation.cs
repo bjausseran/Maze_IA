@@ -10,7 +10,7 @@ public class MessageAnimation : MonoBehaviour
         Success,
         Info,
         Warning,
-        Alerte,
+        Error,
     }
     private Color[] colors = { new Color(0.6f, 0.6f, 1f), new Color(0.6f, 1f, 0.6f), new Color(1f, 0.8f, 0.5f), new Color(1f, 0.6f, 0.6f) };
 

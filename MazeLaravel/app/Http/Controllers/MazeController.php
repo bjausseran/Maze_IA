@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Test;
 use App\Maze;
+use App\NameList;
+use App\NameObj;
 use App\User;
 use Illuminate\Http\Request;
+
 
 class MazeController extends Controller
 {
@@ -21,8 +24,9 @@ class MazeController extends Controller
     }
     public function getNames()
     {
-        $mazes = Maze::pluck('name')->all();
-        return $mazes;
+        $mazes = Maze::orderBy('id', 'asc')->select('id', 'name')->get();
+        return array('Items' => $mazes);
+
     }
 
     /**

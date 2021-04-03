@@ -507,6 +507,8 @@ class ComposerStaticInitcb39704334cdd3ac5b8b63b417c05165
         'App\\Http\\Middleware\\TrustProxies' => __DIR__ . '/../..' . '/app/Http/Middleware/TrustProxies.php',
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',
         'App\\Maze' => __DIR__ . '/../..' . '/app/Maze.php',
+        'App\\NameList' => __DIR__ . '/../..' . '/app/Maze.php',
+        'App\\NameObj' => __DIR__ . '/../..' . '/app/Maze.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
         'App\\Providers\\BroadcastServiceProvider' => __DIR__ . '/../..' . '/app/Providers/BroadcastServiceProvider.php',
