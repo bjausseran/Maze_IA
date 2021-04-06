@@ -11,6 +11,7 @@ public class HttpRequestHelper : MonoBehaviour
     public IEnumerator GetMazeList()
     {
         UnityWebRequest www = UnityWebRequest.Get(API_URL + "mazelist");
+        www.SetRequestHeader("USERKEY", MazeUser.GetInstance().GetApiKey());
         yield return www.SendWebRequest();
         string output = null;
         if (www.result != UnityWebRequest.Result.Success)
@@ -32,6 +33,7 @@ public class HttpRequestHelper : MonoBehaviour
     public IEnumerator GetMazeJson(int id)
     {
         UnityWebRequest www = UnityWebRequest.Get(API_URL + "maze/json/" + id);
+        www.SetRequestHeader("USERKEY", MazeUser.GetInstance().GetApiKey());
         yield return www.SendWebRequest();
         string output = null;
         if (www.result != UnityWebRequest.Result.Success)
@@ -51,8 +53,61 @@ public class HttpRequestHelper : MonoBehaviour
         }
     }
 
+    public IEnumerator TryLogin(string name, string password)
+    {
+        WWWForm data = new WWWForm();
+        data.AddField("name", name);
+        data.AddField("password", password);
 
-    public IEnumerator UploadMaze(string name, int authorId, string mapData)
+        UnityWebRequest www = UnityWebRequest.Post(API_URL + "user/login", data);
+
+        using (www)
+        {
+
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log("HttpRequestHelper, TryLogin : www.error = " + www.error);
+                yield return www.error;
+            }
+            else
+            {
+                Debug.Log("HttpRequestHelper, TryLogin : www.response = " + www.downloadHandler.text);
+                yield return www.downloadHandler.text;
+            }
+
+        }
+    }
+    public IEnumerator RegisterUser(string name, string email, string password)
+    {
+        WWWForm data = new WWWForm();
+        data.AddField("name", name);
+        data.AddField("email", email);
+        data.AddField("password", password);
+
+        UnityWebRequest www = UnityWebRequest.Post(API_URL + "user", data);
+
+        using (www)
+        {
+
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log("HttpRequestHelper, RegisterUser : www.error = " + www.error);
+                yield return false;
+            }
+            else
+            {
+                Debug.Log("HttpRequestHelper, RegisterUser : www.success = " + www.downloadHandler.text);
+                yield return www.downloadHandler.text;
+            }
+
+        }
+    }
+
+    public IEnumerator UploadMaze(string name, string mapData, int authorId)
     {
         WWWForm data = new WWWForm();
         data.AddField("name", name);
@@ -60,6 +115,8 @@ public class HttpRequestHelper : MonoBehaviour
         data.AddField("composition", mapData);
 
         UnityWebRequest www = UnityWebRequest.Post(API_URL + "maze", data);
+
+        www.SetRequestHeader("USERKEY", MazeUser.GetInstance().GetApiKey());
 
         using (www)
         {
@@ -85,6 +142,7 @@ public class HttpRequestHelper : MonoBehaviour
         {
             www.SetRequestHeader("Accept", "application/json");
             www.SetRequestHeader("Content-Type", "application/json");
+            www.SetRequestHeader("USERKEY", MazeUser.GetInstance().GetApiKey());
             www.uploadHandler.contentType = "application/json";
             Debug.Log("HttpRequestHelper, UpdateMap : rawdata = " + all);
             www.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(all));

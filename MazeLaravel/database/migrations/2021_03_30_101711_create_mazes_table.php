@@ -13,7 +13,9 @@ class CreateMazesTable extends Migration
      */
     public function up()
     {
+
         Schema::create('mazes', function (Blueprint $table) {
+
             $table->id();
             $table->string('name');
             $table->unsignedBigInteger('user_id')->unsigned();

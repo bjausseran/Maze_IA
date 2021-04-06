@@ -12,7 +12,7 @@ public class MazeGrid
     [Header("Grid Infos")]
     private Sprite tile;
     private GameObject map;
-    private MazeMode mode;
+    private MazeModes mode;
     private int width;
     private int height;
     private int tileNb;
@@ -20,9 +20,10 @@ public class MazeGrid
     private Vector3 originPosition;
     private MazeTile defaultTile;
     private MazeTile[,] gridArray;
+    private SpriteRenderer[,] baseArray;
     private SpriteRenderer[,] spriteArray;
-
-    public MazeGrid(int width, int height, float cellSize, MazeTile defaultTile, MazeMode mode)
+    
+    public MazeGrid(int width, int height, float cellSize, MazeTile defaultTile, MazeModes mode)
     {
         //Load a Sprite (Assets/Resources/Sprites/sprite01.png)
         tile = Resources.Load<Sprite>("Sprites/tile01");
@@ -35,34 +36,37 @@ public class MazeGrid
         this.defaultTile = defaultTile;
         this.originPosition = new Vector3(- width * cellSize * 0.5f, - height * cellSize * 0.5f);
 
+        Debug.Log("MazeGrid, MazeGrid : width = " + width + ", heigth = " + height);
+
+        baseArray = new SpriteRenderer[width, height];
         gridArray = new MazeTile[width, height];
         spriteArray = new SpriteRenderer[width, height];
+
+        Debug.Log("MazeGrid, MazeGrid : testif = before");
+        if (width == 1 && height == 1) return;
+        Debug.Log("MazeGrid, MazeGrid : testif = after");
 
         for (int x = 0; x < gridArray.GetLength(0); x++)
         {
             for (int y = 0; y < gridArray.GetLength(1); y++)
             {
 
-                if (mode == MazeMode.Editor)
+                if (mode == MazeModes.Editor)
                 {
                     //A bigger tilemap size to show a white grid, just visual
-                    CreateTile(map.transform, "base", GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, Color.white, 1f);
+                    baseArray[x, y] = CreateTile(map.transform, "base", GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, Color.white, 1f, 0);
 
                     //Create the sprite array, use to display tile design
-                    spriteArray[x, y] = CreateTile(map.transform, "maze", GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, Camera.main.backgroundColor, 0.95f);
+                    spriteArray[x, y] = CreateTile(map.transform, "maze", GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, Camera.main.backgroundColor, 0.90f, 1);
                     SetValue(x, y, defaultTile);
                 }
                 else 
                 {
-                    spriteArray[x, y] = CreateTile(map.transform, "maze", GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, Camera.main.backgroundColor, 1f);
+                    spriteArray[x, y] = CreateTile(map.transform, "maze", GetWorldPosition(x, y) + new Vector3(cellSize, cellSize) * .5f, Camera.main.backgroundColor, 1f, 1);
                     SetValue(x, y, defaultTile);
-                }
-                //Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x, y + 1), Color.white, 100f);
-                //Debug.DrawLine(GetWorldPosition(x, y), GetWorldPosition(x + 1, y), Color.white, 100f);
+                } 
             }
-        }
-        //Debug.DrawLine(GetWorldPosition(0, height), GetWorldPosition(width, height), Color.white, 100f);
-        //Debug.DrawLine(GetWorldPosition(width, 0), GetWorldPosition(width, height), Color.white, 100f);
+        } 
     }
 
     private Vector3 GetWorldPosition(int x, int y)
@@ -74,7 +78,7 @@ public class MazeGrid
     {
         if (x >= 0 && y >= 0 && x < width && y < height)
         {
-            if (mode == MazeMode.Editor)
+            if (mode == MazeModes.Editor)
             {
                 if (tile.GetTileType() == MazeTile.TileTypes.Start && !(FindStart()[0] == x && FindStart()[1] == y))
                 {
@@ -90,6 +94,21 @@ public class MazeGrid
             }
             if (gridArray[x, y]) GameObject.Destroy(gridArray[x, y].gameObject.GetComponent<MazeTile>());
             gridArray[x, y] = (MazeTile) spriteArray[x, y].gameObject.AddComponent(tile.GetType());
+            gridArray[x, y].SetXPos(x);
+            gridArray[x, y].SetYPos(y);
+            spriteArray[x, y].color = tile.GetColor();
+            Debug.Log("MazeGrid, SetValue(x:y) : Color = " + tile.GetColor());
+
+        }
+    }
+    public void LoadValue(int x, int y, MazeTile tile)
+    {
+        if (x >= 0 && y >= 0 && x < width && y < height)
+        {
+            if (gridArray[x, y]) GameObject.Destroy(gridArray[x, y].gameObject.GetComponent<MazeTile>());
+            Debug.Log("MazeGrid, LoadValue : " + tile.GetType());
+            Debug.Log("MazeGrid, LoadValue : " + spriteArray[x, y]);
+            gridArray[x, y] = (MazeTile)spriteArray[x, y].gameObject.AddComponent(tile.GetType());
             gridArray[x, y].SetXPos(x);
             gridArray[x, y].SetYPos(y);
             spriteArray[x, y].color = tile.GetColor();
@@ -184,7 +203,7 @@ public class MazeGrid
         this.height = height;
     }
 
-    public SpriteRenderer CreateTile(Transform parent, string name, Vector3 localPosition, Color color, float size)
+    public SpriteRenderer CreateTile(Transform parent, string name, Vector3 localPosition, Color color, float size, int sortingOrder)
     {
         Debug.Log("MazeGrid, CreateTile : Color = " + color);
         GameObject gameObject = new GameObject(name + "_tile_" + tileNb, typeof(SpriteRenderer));
@@ -196,11 +215,25 @@ public class MazeGrid
         SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = tile;
         spriteRenderer.color = color;
+        spriteRenderer.sortingOrder = sortingOrder;
         return spriteRenderer;
     }
     public GameObject GetMapObject()
     {
         return map;
+    }
+    public void DestroyGrid()
+    {
+        for (int x = 0; x < gridArray.GetLength(0); x++)
+        {
+            for (int y = 0; y < gridArray.GetLength(1); y++)
+            {
+                if (mode == MazeModes.Editor) GameObject.Destroy(baseArray[x, y].gameObject);
+                if (gridArray[x, y]) GameObject.Destroy(gridArray[x, y].gameObject);
+                if (spriteArray[x, y]) GameObject.Destroy(spriteArray[x, y].gameObject);
+            }
+        }
+        
     }
 
 }

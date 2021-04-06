@@ -2,6 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Resolvability
+{
+    True,
+    False,
+    Unknow
+}
 public class Pathfinding 
 {
     private const int MOVE_STRAIGHT_COST = 10;
@@ -12,6 +18,11 @@ public class Pathfinding
     private MazeGrid grid;
     private List<MazeTile> openList;
     private List<MazeTile> closedList;
+
+    private int totalCost = 0;
+    private int nbStep = 0;
+    private Resolvability resolvable = Resolvability.Unknow;
+
     public Pathfinding(MazeGrid grid)
     {
         this.grid = grid;
@@ -19,6 +30,9 @@ public class Pathfinding
 
     public List<MazeTile> FindPath(int startX, int startY, int endX, int endY)
     {
+        totalCost = 0;
+        nbStep = 0;
+        resolvable = Resolvability.Unknow;
         MazeTile startStep = grid.GetValue(startX, startY);
         MazeTile endStep = grid.GetValue(endX, endY);
 
@@ -54,8 +68,9 @@ public class Pathfinding
                 if (currentStep == endStep)
                 {
                     Debug.Log("Pathfinding, FindPath : Path Founded");
-                    //the end
-                    return CalculatePath(endStep);
+                //the end
+                resolvable = Resolvability.True;
+                return CalculatePath(endStep);
                 }
                 openList.Remove(currentStep);
                 closedList.Add(currentStep);
@@ -98,9 +113,23 @@ public class Pathfinding
                 }
                 Debug.Log("Pathfinding, FindPath : openList.Count 03 = " + openList.Count);
             }
-        
+
         // There is no way
+        resolvable = Resolvability.False;
         return null;
+    }
+
+    public Resolvability GetResolvability()
+    {
+        return resolvable;
+    }
+    public int GetTotalCost()
+    {
+        return totalCost;
+    }
+    public int GetNumberOfSteps()
+    {
+        return nbStep;
     }
 
     private MazeTile GetStep(int x, int y)
@@ -115,6 +144,8 @@ public class Pathfinding
         MazeTile currentStep = endStep;
         while(currentStep.previousStep != null)
         {
+            nbStep++;
+            totalCost += currentStep.previousStep.GetSpeedModifier();
             path.Add(currentStep.previousStep);
             currentStep = currentStep.previousStep;
         }

@@ -2,50 +2,85 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MazeBet : MonoBehaviour
+public class MazeBet : MazeMode
 {
 
     [Header("Component")]
-    [SerializeField] MazeMap map;
+    [SerializeField] BetUI ui;
+    [SerializeField] Color[] color = { Color.red, Color.blue, Color.green, Color.black, Color.cyan, Color.gray, Color.magenta, Color.white };
     [SerializeField] TypeToTileConverter converter;
     [SerializeField] Pathfinding pathfinding;
     [SerializeField] List<MazeTile> tileList = new List<MazeTile>();
+    [SerializeField] List<MazeBot> bots = new List<MazeBot>();
+    bool botCanMove = false;
 
     private void Start()
     {
-
         converter = TypeToTileConverter.GetInstance();
         converter.SetArray(tileList.ToArray());
-        map = new MazeMap(24, 15, 0.5f, tileList[0], MazeMode.Bet);
-        map.LoadMostRecent();
-        pathfinding = new Pathfinding(map.GetGrid());
+        ui.DisplayFileWindow();
+        Debug.Log("MazeBet, Start : " + MazeUser.GetInstance().ToString());
+
+    }
+    public void ReinitializeBots()
+    {
+        foreach (MazeBot bot in bots)
+        {
+            bot.Initialize();
+        }
     }
 
-    private void Update()
+    public void SetBotFromUI()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (bots.Count <= 0) return;
+        SetBotCanMove(!botCanMove);
+    }
+    public void SetBotCanMove(bool value)
+    {
+        botCanMove = value;
+        foreach (MazeBot bot in bots)
         {
-            //Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            //Debug.Log("MazeResolver, Update : mouse world pos = " + mouseWorldPosition);
-            //map.GetGrid().GetXY(mouseWorldPosition, out int x, out int y);
-            //Debug.Log("MazeResolver, Update : mouse in & out = " + x + ", " + y);
-            var start = map.GetGrid().FindStart();
-            var end = map.GetGrid().FindEnd();
-
-            List<MazeTile> path = pathfinding.FindPath(start[0], start[1], end[0], end[1]);
-            if (path != null)
-            {
-                for (int i = 1; i < path.Count - 1;  i++)
-                {
-                    Debug.Log("MazeResolver, Update : path i = " + path[i].GetXPos() + ", " + path[i].GetYPos());
-                    map.GetGrid().SetValue(path[i].GetXPos(), path[i].GetYPos(), tileList[7]);
-                }
-            }
+            bot.SetCanMove(value);
         }
+    }
 
-        if (Input.GetMouseButton(1))
+    public void CreateBot()
+    {
+        Debug.Log("MazeBet, CreateBot : start");
+        pathfinding = new Pathfinding(map.GetGrid());
+
+
+        SetBotCanMove(false);
+
+        GameObject bankObject = new GameObject("bot_", typeof(BotBank));
+        bankObject.GetComponent<BotBank>().SetGrid(map.GetGrid());
+        bankObject.GetComponent<BotBank>().SetColor(Color.yellow);
+
+        bots.Add(bankObject.GetComponent<BotBank>());
+
+        for (int i = 0; i < color.Length; i++)
         {
-            map.SetTileValue(Camera.main.ScreenToWorldPoint(Input.mousePosition), tileList[0]);
+            GameObject gameObject = new GameObject("bot_", typeof(BotRunner));
+            gameObject.GetComponent<BotRunner>().SetGrid(map.GetGrid());
+            gameObject.GetComponent<BotRunner>().SetColor(color[i]);
+            bots.Add(gameObject.GetComponent<BotRunner>());
+        }
+    }
+
+    public void DeleteBot()
+    {
+        for (int i = 0; i < bots.Count; i++)
+        {
+            Destroy(bots[i].gameObject);
+        }
+        bots.Clear();
+    }
+
+        private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            ui.DisplayFileWindow();
         }
     }
 }

@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MazeResolver : MonoBehaviour
+public class MazeResolver : MazeMode
 {
 
     [Header("Component")]
-    [SerializeField] MazeMap map;
+    [SerializeField] ResolverUI ui;
     [SerializeField] TypeToTileConverter converter;
     [SerializeField] Pathfinding pathfinding;
     [SerializeField] List<MazeTile> tileList = new List<MazeTile>();
@@ -15,37 +15,44 @@ public class MazeResolver : MonoBehaviour
     {
 
         converter = TypeToTileConverter.GetInstance();
+        ui.DisplayFileWindow();
         converter.SetArray(tileList.ToArray());
-        map = new MazeMap(24, 15, 0.5f, tileList[0], MazeMode.Resolver);
+        /*map = new MazeMap(24, 15, 0.5f, tileList[0], MazeModes.Resolver);
         map.LoadMostRecent();
+        pathfinding = new Pathfinding(map.GetGrid());*/
+    }
+    public Pathfinding GetPathfinding()
+    {
+        return pathfinding;
+    }
+
+    public override void SetMap(MazeMap map)
+    {
+        base.SetMap(map);
         pathfinding = new Pathfinding(map.GetGrid());
     }
 
-    private void Update()
+    public Resolvability FindPath()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            //Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            //Debug.Log("MazeResolver, Update : mouse world pos = " + mouseWorldPosition);
-            //map.GetGrid().GetXY(mouseWorldPosition, out int x, out int y);
-            //Debug.Log("MazeResolver, Update : mouse in & out = " + x + ", " + y);
-            var start = map.GetGrid().FindStart();
-            var end = map.GetGrid().FindEnd();
+        if (map == null) return Resolvability.Unknow;
+        var start = map.GetGrid().FindStart();
+        var end = map.GetGrid().FindEnd();
 
-            List<MazeTile> path = pathfinding.FindPath(start[0], start[1], end[0], end[1]);
-            if (path != null)
+        List<MazeTile> path = pathfinding.FindPath(start[0], start[1], end[0], end[1]);
+        if (path != null)
+        {
+            for (int i = 1; i < path.Count - 1; i++)
             {
-                for (int i = 1; i < path.Count - 1;  i++)
-                {
-                    Debug.Log("MazeResolver, Update : path i = " + path[i].GetXPos() + ", " + path[i].GetYPos());
-                    map.GetGrid().SetValue(path[i].GetXPos(), path[i].GetYPos(), tileList[7]);
-                }
+                Debug.Log("MazeResolver, Update : path i = " + path[i].GetXPos() + ", " + path[i].GetYPos());
+                map.GetGrid().SetValue(path[i].GetXPos(), path[i].GetYPos(), tileList[7]);
             }
+            return Resolvability.True;
         }
-
-        if (Input.GetMouseButton(1))
+        else 
         {
-            map.SetTileValue(Camera.main.ScreenToWorldPoint(Input.mousePosition), tileList[0]);
+            return Resolvability.False;
         }
+        
+
     }
 }

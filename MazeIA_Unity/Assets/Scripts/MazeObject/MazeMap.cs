@@ -9,28 +9,25 @@ public class MazeMap
     private MazeGrid grid;
     private int width;
     private int height;
+    private MazeTile baseTile;
     private TypeToTileConverter converter;
+    private MazeModes mode;
 
-    public MazeMap(int width, int height, float cellSize, MazeTile tile, MazeMode mode)
+    public MazeMap(int width, int height, float cellSize, MazeTile tile, MazeModes mode)
     {
         this.converter = TypeToTileConverter.GetInstance();
         this.width = width;
         this.height = height;
-        grid = new MazeGrid(width, height, 0.5f, tile, mode);
+        this.mode = mode;
+        this.baseTile = tile;
+        Debug.Log("MazeMap, MazeMap : width = " + width + ", height = " + height);
+        this.grid = new MazeGrid(width, height, 0.5f, tile, mode);
 
-        GameObject bankObject = new GameObject("bot_", typeof(BotBank));
-        bankObject.GetComponent<BotBank>().SetGrid(grid);
-        bankObject.GetComponent<BotBank>().SetColor(Color.yellow);
-        Color[] color = { Color.red, Color.blue, Color.green, Color.black, Color.cyan, Color.gray, Color.magenta };
-        if (mode == MazeMode.Bet)
-        {
-            for (int i = 0; i < color.Length; i++)
-            {
-                GameObject gameObject = new GameObject("bot_", typeof(BotRunner));
-                gameObject.GetComponent<BotRunner>().SetGrid(grid);
-                gameObject.GetComponent<BotRunner>().SetColor(color[i]);
-            }
-        }
+        
+    }
+    public MazeModes GetMode()
+    {
+        return mode;
     }
     public MazeGrid GetGrid()
     {
@@ -101,22 +98,52 @@ public class MazeMap
         Debug.Log("MazeMap, Load : fileName = " + fileName);
         MazeTile.SaveObject[] saveObjectArray = JsonHelper.FromJson<MazeTile.SaveObject>(SaveSystem.LoadMap(fileName));
         Debug.Log("MazeMap, Load : saveobject lenght + " + saveObjectArray.Length);
+
         foreach (MazeTile.SaveObject mazeTileSaved in saveObjectArray)
         {
             grid.SetValue(mazeTileSaved.x, mazeTileSaved.y, converter.EnumToTile(mazeTileSaved.type));
         }
     }
+
+    private int[] FindWidthAndHeight(MazeTile.SaveObject[] tileSaved)
+    {
+        var width = 0;
+        var height = 0;
+        for (int i = 0; i < tileSaved.Length; i++)
+        {
+            if (tileSaved[i].x + 1 > width) width = tileSaved[i].x + 1;
+            if (tileSaved[i].y + 1 > height) height = tileSaved[i].y + 1;
+        }
+        Debug.Log("MazeMap, FindWidthAndHeight : width, height = " + width + ", " + height);
+        return new int[2]{ width, height };
+    }
+
     public bool LoadFromAPI(string json)
     {
-        Debug.Log("MazeMap, Load : json = " + json);
+        Debug.Log("MazeMap, LoadFromAPI : json = " + json);
         if (JsonHelper.FromJson<MazeTile.SaveObject>(json) == null) return false;
         MazeTile.SaveObject[] saveObjectArray = JsonHelper.FromJson<MazeTile.SaveObject>(json);
-        Debug.Log("MazeMap, Load : saveobject lenght + " + saveObjectArray.Length);
+        Debug.Log("MazeMap, LoadFromAPI : saveobject lenght + " + saveObjectArray.Length);
+
+        grid.DestroyGrid();
+        var size = FindWidthAndHeight(saveObjectArray);
+        SetWidth(size[0]);
+        SetHeight(size[1]);
+        if (baseTile == null) baseTile = converter.EnumToTile(MazeTile.TileTypes.Path);
+        grid = new MazeGrid(size[0], size[1], 0.5f, baseTile, mode);
         foreach (MazeTile.SaveObject mazeTileSaved in saveObjectArray)
         {
-            grid.SetValue(mazeTileSaved.x, mazeTileSaved.y, converter.EnumToTile(mazeTileSaved.type));
+            grid.LoadValue(mazeTileSaved.x, mazeTileSaved.y, converter.EnumToTile(mazeTileSaved.type));
         }
         return true;
+    }
+    public IEnumerator GenerateGrid(int width, int height)
+    {
+        grid.DestroyGrid();
+        grid = new MazeGrid(width, height, 0.5f, baseTile, mode);
+        SetWidth(width);
+        SetHeight(height);
+        yield return true;
     }
 
     public void LoadMostRecent()

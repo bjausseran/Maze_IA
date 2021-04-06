@@ -2,12 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MazeEditor : MonoBehaviour
+public class MazeEditor : MazeMode
 {
 
     [Header("Component")]
     [SerializeField] EditorUI ui;
-    [SerializeField] MazeMap map;
     [SerializeField] TypeToTileConverter converter;
     [SerializeField] List<MazeTile> tileList = new List<MazeTile>();
     [Header("Brush Infos")]
@@ -18,7 +17,7 @@ public class MazeEditor : MonoBehaviour
         
         converter = TypeToTileConverter.GetInstance();
         converter.SetArray(tileList.ToArray());
-        map = new MazeMap(24, 15, 0.5f, tileList[0], MazeMode.Editor);
+        map = new MazeMap(24, 15, 0.5f, tileList[0], MazeModes.Editor);
         ui.SetMap(map);
     }
 
@@ -35,14 +34,12 @@ public class MazeEditor : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.S)){
-            //map.Save();
-            ui.DisplayFileWindow(EditorUI.FileMode.Save);
+            ui.DisplayFileWindow(FileMode.Save);
         }
 
         if (Input.GetKeyDown(KeyCode.L))
         {
-            //map.Load();
-            ui.DisplayFileWindow(EditorUI.FileMode.Load);
+            ui.DisplayFileWindow(FileMode.Load);
         }
     }
     public void SetCurrentTile(int tileNb)

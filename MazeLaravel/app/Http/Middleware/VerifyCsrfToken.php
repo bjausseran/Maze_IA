@@ -13,6 +13,8 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         'maze/*',
+        'user/*',
         'http://mazelaravel.test/api/maze',
+        'http://mazelaravel.test/api/user',
     ];
 }
