@@ -36,23 +36,16 @@ public class Pathfinding
         MazeTile startStep = grid.GetValue(startX, startY);
         MazeTile endStep = grid.GetValue(endX, endY);
 
-        Debug.Log("Pathfinding, FindPath : start  = " + startStep);
-        Debug.Log("Pathfinding, FindPath : end  = " + endStep);
         openList = new List<MazeTile> { startStep };
         closedList = new List<MazeTile>();
-        Debug.Log("Pathfinding, FindPath : openList.Count 01 = " + openList[0]);
-
-        Debug.Log("Pathfinding, FindPath : grid.GetWidth = " + grid.GetWidth());
         for (int x = 0; x < grid.GetWidth(); x++)
         {
             for (int y = 0; y < grid.GetHeight(); y++)
             {
-                Debug.Log("Pathfinding, FindPath : grid.GetValue = " + grid.GetValue(x, y));
                 MazeTile MazeTile = grid.GetValue(x, y);
                 MazeTile.SetGCost(int.MaxValue);
                 MazeTile.CalculateFCost();
                 MazeTile.previousStep = null;
-                Debug.Log("Pathfinding, FindPath : grid.GetValue.gCost = " + grid.GetValue(x, y).gCost);
             }
         }
             startStep.SetGCost(0);
@@ -62,12 +55,9 @@ public class Pathfinding
 
                 while (openList.Count > 0)
             {
-                Debug.Log("Pathfinding, FindPath : openList.Count 02 = " + openList[0]);
                 MazeTile currentStep = GetLowestFCostStep(openList);
-                Debug.Log("Pathfinding, FindPath : current step : " + currentStep);
                 if (currentStep == endStep)
                 {
-                    Debug.Log("Pathfinding, FindPath : Path Founded");
                 //the end
                 resolvable = Resolvability.True;
                 return CalculatePath(endStep);
@@ -78,8 +68,6 @@ public class Pathfinding
                 var it = 0;
                 foreach(MazeTile adjacentStep in GetListAdjacent(currentStep))
                 {
-                    Debug.Log("Pathfinding, FindPath : adjacentStep = " + it + ", " + adjacentStep);
-                    Debug.Log("Pathfinding, FindPath : adjacentStep.gCost = " + it + ", " + adjacentStep.GetGCost());
                     it++;
                     if (closedList.Contains(adjacentStep)) continue;
                     if (!adjacentStep.GetWalkable())
@@ -96,22 +84,18 @@ public class Pathfinding
 
                     //GetSpeedModifier is for the mud
                     int tentativeGCost = currentStep.GetGCost()+ CalculateDistanceCost(currentStep, adjacentStep)*adjacentStep.GetSpeedModifier();
-                    Debug.Log("Pathfinding, FindPath : tentativeGCost < adjacentStep.gCost = " + tentativeGCost + "< " + adjacentStep.GetGCost());
                     if (tentativeGCost < adjacentStep.GetGCost())
                     {
                         adjacentStep.previousStep = currentStep;
                         adjacentStep.SetGCost(tentativeGCost);
                         adjacentStep.hCost = CalculateDistanceCost(adjacentStep, endStep);
                         adjacentStep.CalculateFCost();
-
-                        Debug.Log("Pathfinding, FindPath : !openList.Contains(adjacentStep) = " + !openList.Contains(adjacentStep));
                         if (!openList.Contains(adjacentStep))
                         {
                             openList.Add(adjacentStep);
                         }
                     }
                 }
-                Debug.Log("Pathfinding, FindPath : openList.Count 03 = " + openList.Count);
             }
 
         // There is no way

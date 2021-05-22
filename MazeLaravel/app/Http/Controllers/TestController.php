@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Test;
 use App\Maze;
 use Illuminate\Http\Request;
+use Carbon;
 
 class TestController extends Controller
 {
@@ -40,6 +41,7 @@ class TestController extends Controller
         {
             $test->$key = $value;
         }
+        $test->test_at = Carbon\Carbon::now();
         $test->save();
 
         return $test;

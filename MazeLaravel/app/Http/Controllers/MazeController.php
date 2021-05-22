@@ -8,6 +8,7 @@ use App\NameList;
 use App\NameObj;
 use App\User;
 use Illuminate\Http\Request;
+use Faker\Generator as Faker;
 
 
 class MazeController extends Controller
@@ -96,6 +97,15 @@ class MazeController extends Controller
     public function getJSon(Maze $maze)
     {
         return $maze->composition;
+    }
+    public function getRandomMaze(String $name, Int $authorId)
+    {
+        factory(Maze::class, 1)->create();
+        $lastMaze = $mazes = Maze::orderBy('id', 'desc')->first();
+        $lastMaze->name = $name;
+        $lastMaze->user_id = $authorId;
+        $lastMaze->save();
+        return $lastMaze->composition;
     }
 
     /**

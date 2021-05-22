@@ -103,12 +103,28 @@ public class MazeManager : MonoBehaviour
         {
             var http = gameObject.AddComponent<HttpRequestHelper>();
             CoroutineWithData cd = new CoroutineWithData(this, http.GetMazeList());
-            StartCoroutine(WaitForNameList(cd, mode));
+            StartCoroutine(WaitForNameList(cd, mode, false));
+            Debug.Log("EditorUI, DisplayFileWindow : http response : " + cd.result);  //  'success' or 'fail'
+        }
+    }
+    public void DisplayFileWindow(FileMode mode, bool autoSelectLast)
+    {
+        if (!ShowHideWindow(mode)) return;
+
+        buttonListContent.parent.parent.gameObject.SetActive(true);
+
+        var fileList = new List<string>();
+        if (!fromHttp) fileList = SaveSystem.GetFileList();
+        else
+        {
+            var http = gameObject.AddComponent<HttpRequestHelper>();
+            CoroutineWithData cd = new CoroutineWithData(this, http.GetMazeList());
+            StartCoroutine(WaitForNameList(cd, mode, true));
             Debug.Log("EditorUI, DisplayFileWindow : http response : " + cd.result);  //  'success' or 'fail'
         }
     }
 
-    private IEnumerator WaitForNameList(CoroutineWithData corout, FileMode mode)
+    private IEnumerator WaitForNameList(CoroutineWithData corout, FileMode mode, bool autoSelectLast)
     {
         while (!(corout.result is string) || corout.result == null)
         {
@@ -119,7 +135,7 @@ public class MazeManager : MonoBehaviour
         var responseList = JsonHelper.FromJson<MazeMap.SavedObject>((string)corout.result);
         mapList = responseList;
         Debug.Log("EditorUI, WaitForData : data length = " + responseList.Length);
-        CreateButtons(mapList, mode);
+        CreateButtons(mapList, mode, autoSelectLast);
         yield return true;
     }
     private IEnumerator WaitForJson(CoroutineWithData corout, FileMode mode)
@@ -181,12 +197,65 @@ public class MazeManager : MonoBehaviour
             yield return true;
         }
     }
+    private IEnumerator WaitForJson(CoroutineWithData corout, FileMode mode, bool rndMode)
+    {
+        if (mode == FileMode.Load)
+        {
+            while (corout.result == null || (!(corout.result is string) && !(corout.result is bool)))
+            {
+                Debug.Log("EditorUI, WaitForData : data is null");
+                yield return false;
+            }
+            var alertObj = Instantiate(alertPrefab, transform);
+            var messageAlert = alertObj.GetComponent<MessageAnimation>();
+            messageAlert.SetUpMessage("Error while load :", "Map not load", MessageAnimation.Colors.Error);
+            Debug.Log("EditorUI, WaitForData : data = " + corout.result);
+
+            if (corout.result is string)
+            {
+                Debug.Log("EditorUI, WaitForData : data result = " + (string)corout.result);
+                var responseList = JsonHelper.FromJson<MazeTile.SaveObject>((string)corout.result);
+                if (map == null) map = new MazeMap(1, 1, 0.5f, null, this.mode);
+                if (map.LoadFromAPI((string)corout.result))
+                {
+                    FindObjectOfType<ModeUI>().SetUIMapNap(selectedMap.name);
+                    messageAlert.SetUpMessage("Maze loaded :", selectedMap.name + " looks like a\r\ngood playground", MessageAnimation.Colors.Success);
+                    var mazeResolver = FindObjectOfType<MazeResolver>();
+                    mazeResolver.SetMap(map);
+                    var resolverUi = FindObjectOfType<ResolverUI>();
+                    resolverUi.ResetValues();
+                    DisplayFileWindow(mode, true);
+                    DisplayFileWindow(mode, true);
+                    if (rndMode) FindObjectOfType<ResolverUI>().SetValues();
+                    
+                }
+            }
+
+        }
+        else
+        {
+            while (!(corout.result is bool))
+            {
+                Debug.Log("EditorUI, WaitForData : data is null");
+                yield return false;
+            }
+            var alertObj = Instantiate(alertPrefab, transform);
+            var messageAlert = alertObj.GetComponent<MessageAnimation>();
+            messageAlert.SetUpMessage("Error while saving :", mapName + " not saved", MessageAnimation.Colors.Error);
+            if ((bool)corout.result) messageAlert.SetUpMessage("Maze saved :", "You can be\r\nproud of " + mapName, MessageAnimation.Colors.Success);
+
+            FindObjectOfType<ModeUI>().SetUIMapNap(mapName);
+            DisplayFileWindow(mode);
+            DisplayFileWindow(mode);
+            yield return true;
+        }
+    }
 
     public void SetMapName(string mapName)
     {
         this.mapName = mapName;
     }
-    private void CreateButtons(MazeMap.SavedObject[] map, FileMode mode)
+    private void CreateButtons(MazeMap.SavedObject[] map, FileMode mode, bool autoSelectLast)
     {
         loadImage.enabled = false;
         for (int i = 0; i < map.Length; i++)
@@ -200,7 +269,7 @@ public class MazeManager : MonoBehaviour
 
             button.GetComponent<Button>().onClick.AddListener(delegate { SetSelectedMap(str, button.GetComponent<Button>(), buttonText); });
             button.transform.SetParent(buttonListContent);
-
+            if (i == map.Length - 1 && autoSelectLast) SetSelectedMap(str, button.GetComponent<Button>(), buttonText);
         }
     }
     public void SetSelectedMap(MazeMap.SavedObject map, Button button, Text text)
@@ -248,14 +317,43 @@ public class MazeManager : MonoBehaviour
         StartCoroutine(WaitForJson(cd, FileMode.Load));
         Debug.Log("EditorUI, RequestMap : http response : " + cd.result);  //  'success' or 'fail'
     }
+    public void RequestRandomMap(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            var alertObj = Instantiate(alertPrefab, transform);
+            var messageAlert = alertObj.GetComponent<MessageAnimation>();
+            messageAlert.SetUpMessage("Add a name :", "How are you\r\ngonna call that ?", MessageAnimation.Colors.Warning);
+            return;
+        }
+        selectedMap = new MazeMap.SavedObject();
+        selectedMap.id = mapList[mapList.Length - 1].id + 1;
+        selectedMap.name = name;
+        var http = gameObject.AddComponent<HttpRequestHelper>();
+        CoroutineWithData cd = new CoroutineWithData(this, http.GetRandomMaze(name, MazeUser.GetInstance().GetId()));
+        StartCoroutine(WaitForJson(cd, FileMode.Load, true));
+        Debug.Log("EditorUI, RequestMap : http response : " + cd.result);  //  'success' or 'fail'
+    }
 
-    private int GetSavedObjectId(string mazeName)
+    public int GetSavedObjectId(string mazeName)
     {
         foreach (MazeMap.SavedObject obj in mapList)
         {
             if (obj.name == selectedMap.name) return obj.id;
         }
         return 0;
+    }
+    public int GetSelectedMapId()
+    {
+        if (selectedMap != null) return selectedMap.id;
+        
+        return 0;
+    }
+    public int GetSelectedOrNew()
+    {
+        var id = mapList[mapList.Length - 1].id + 1;
+        if (selectedMap != null) id = selectedMap.id;
+        return id;
     }
     //Unused, can be use to upload map from file
     public void LoadMap()

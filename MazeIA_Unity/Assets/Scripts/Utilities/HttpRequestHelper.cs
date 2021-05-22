@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.Networking;
 using System.Collections.Generic;
+using System;
 
 public class HttpRequestHelper : MonoBehaviour
 {
@@ -52,6 +53,7 @@ public class HttpRequestHelper : MonoBehaviour
             Debug.Log("HttpRequestHelper, GetMazeJson : success : " + results.Length);
         }
     }
+
 
     public IEnumerator TryLogin(string name, string password)
     {
@@ -159,6 +161,57 @@ public class HttpRequestHelper : MonoBehaviour
                 Debug.Log("HttpRequestHelper, UpdateMap : www.success = " +  www.downloadHandler.text);
                 yield return true;
             }
+        }
+    }
+    public IEnumerator SendTest(int mapId, int result)
+    {
+        WWWForm data = new WWWForm();
+        data.AddField("maze_id", mapId);
+        data.AddField("result", result);
+
+        UnityWebRequest www = UnityWebRequest.Post(API_URL + "test", data);
+
+        www.SetRequestHeader("USERKEY", MazeUser.GetInstance().GetApiKey());
+        Debug.Log("HttpRequestHelper, SendTest : sending test on maze " + mapId);
+
+        using (www)
+        {
+
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log("HttpRequestHelper, SendTest : www.error = " + www.error);
+                yield return false;
+            }
+            else
+            {
+                Debug.Log("HttpRequestHelper, SendTest : www.success = " + www.downloadHandler.text);
+                yield return true;
+            }
+
+        }
+    }
+    public IEnumerator GetRandomMaze(string name, int authorId)
+    {
+        UnityWebRequest www = UnityWebRequest.Get(API_URL + "randommaze/" + name + "/" + authorId);
+        www.SetRequestHeader("USERKEY", MazeUser.GetInstance().GetApiKey());
+        yield return www.SendWebRequest();
+        string output = null;
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log("HttpRequestHelper, GetMazeJson: error : " + www.error);
+            yield return false;
+        }
+        else
+        {
+            output = www.downloadHandler.text;
+            yield return output;
+            // Show results as text
+
+            // Or retrieve results as binary data
+            byte[] results = www.downloadHandler.data;
+            Debug.Log("HttpRequestHelper, GetMazeJson : success : " + results.Length);
         }
     }
 }
